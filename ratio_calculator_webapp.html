@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colorful Ratio Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffecd2, #fcb69f);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  h1 {
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  }
+  .calculator {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    padding: 20px;
+    max-width: 300px;
+  }
+  input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+  }
+  button {
+    width: 60px;
+    height: 60px;
+    margin: 5px;
+    font-size: 18px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #84fab0, #8fd3f4);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+  button:hover {
+    transform: scale(1.1);
+  }
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .result {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+    background: #f0f0f0;
+    border-radius: 10px;
+    padding: 10px;
+  }
+</style>
+</head>
+<body>
+<h1>Ratio Calculator</h1>
+<div class="calculator">
+  <input type="text" id="display" placeholder="Enter number or ratio">
+  <div class="buttons">
+    <button onclick="appendValue('1')">1</button>
+    <button onclick="appendValue('2')">2</button>
+    <button onclick="appendValue('3')">3</button>
+    <button onclick="appendValue('+')">+</button>
+    <button onclick="appendValue('4')">4</button>
+    <button onclick="appendValue('5')">5</button>
+    <button onclick="appendValue('6')">6</button>
+    <button onclick="appendValue('-')">-</button>
+    <button onclick="appendValue('7')">7</button>
+    <button onclick="appendValue('8')">8</button>
+    <button onclick="appendValue('9')">9</button>
+    <button onclick="appendValue('*')">×</button>
+    <button onclick="appendValue('0')">0</button>
+    <button onclick="appendValue('/')">÷</button>
+    <button onclick="appendValue('/')">/ (ratio)</button>
+    <button onclick="calculate()">=</button>
+    <button onclick="clearDisplay()" style="background: linear-gradient(135deg, #ff758c, #ff7eb3);">C</button>
+    <button onclick="backspace()" style="background: linear-gradient(135deg, #f7971e, #ffd200);">⌫</button>
+  </div>
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+function appendValue(val) {
+  document.getElementById('display').value += val;
+}
+function clearDisplay() {
+  document.getElementById('display').value = '';
+  document.getElementById('result').innerHTML = '';
+}
+function backspace() {
+  let display = document.getElementById('display');
+  display.value = display.value.slice(0, -1);
+}
+function gcd(a, b) {
+  return b ? gcd(b, a % b) : a;
+}
+function simplifyRatio(num, den) {
+  let g = gcd(num, den);
+  return `${num/g}/${den/g}`;
+}
+function calculate() {
+  let expr = document.getElementById('display').value.trim();
+  let resultBox = document.getElementById('result');
+
+  try {
+    if (expr.includes('/')) {
+      let parts = expr.split('/');
+      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        let num = parseFloat(parts[0]);
+        let den = parseFloat(parts[1]);
+        let decimal = num / den;
+        let simple = simplifyRatio(num, den);
+        resultBox.innerHTML = `Decimal: ${decimal}<br>Simplest Ratio: ${simple}`;
+        return;
+      }
+    }
+
+    if (expr.includes('*') && expr.includes('/')) {
+      let factors = expr.split('*');
+      let numProd = 1;
+      let denProd = 1;
+      for (let f of factors) {
+        let p = f.split('/');
+        if (p.length === 2) {
+          numProd *= parseFloat(p[0]);
+          denProd *= parseFloat(p[1]);
+        } else {
+          numProd *= parseFloat(f);
+        }
+      }
+      let decimal = numProd / denProd;
+      let simple = simplifyRatio(numProd, denProd);
+      resultBox.innerHTML = `Decimal: ${decimal}<br>Simplest Ratio: ${simple}`;
+      return;
+    }
+
+    let decimal = eval(expr);
+    resultBox.innerHTML = `Result: ${decimal}`;
+  } catch (e) {
+    resultBox.innerHTML = 'Error in calculation';
+  }
+}
+</script>
+</body>
+</html>
